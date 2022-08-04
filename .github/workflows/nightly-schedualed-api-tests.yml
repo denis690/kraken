@@ -1,0 +1,56 @@
+name: "Kraken API Tests"
+on:
+  schedule:
+    - cron: '15 6 * * MON-FRI' #  7:15 GMT
+  workflow_dispatch:
+
+jobs:
+  api_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Set timeZone"
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "Europe/London"
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Setup Java"
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: "Kraken API Test Suite"
+        id: api_tests
+        env:
+          tests: >-
+            --tests "com.sw.test.addin.WordAddInArticlesForParagraphV2APITest"
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :test ${{ env.tests }}
+      - name: "Setup AWS"
+        uses: aws-actions/configure-aws-credentials@v1
+        if: ${{ always() }}
+        with:
+          aws-access-key-id: ${{ secrets.AWS_GITHUB_ACTIONS_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_GITHUB_ACTIONS_USER_SECRET_ACCESS_KEY }}
+          aws-region: "eu-west-2"
+      - name: "Upload report"
+        if: ${{ always() }}
+        id: upload_report
+        run: |
+          DATE=$(date "+%Y-%m-%d_%H%M%S")
+          aws s3 cp ./build/reports/tests/test/ s3://stage-kraken-e2e-results/${DATE}/  --recursive  --include "*"
+          echo "::set-output name=reportPath::${DATE}/index.html"
+      - name: Notify team
+        if: ${{ failure() }}
+        run: |
+          curl -H 'Content-Type: application/json' -d '{"title": "Kraken API Tests results: STATUS -> ${{ steps.api_tests.outcome }}", "text": "The report can be found <a href='https://e2e.results.stage.kraken.com/${{ steps.upload_report.outputs.reportPath }}'>Here</a>."}' ${{ secrets.TEAMS_NOTIFICATION_TOKEN }}
