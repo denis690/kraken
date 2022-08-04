@@ -1,0 +1,20 @@
+{
+  "attributes": {
+    "arc_attachments": [
+      {
+        "arc_attachment_identity": "blobs/1754b920-cf20-4d7e-9d36-9ed7d479744d",
+        "arc_display_name": "Picture from yesterday",
+        "arc_hash_alg": "sha256",
+        "arc_hash_value": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+      }
+    ],
+    "arc_firmware_version": "3.2.1",
+    "arc_home_location_identity": "locations/42054f10-9952-4c10-a082-9fd0d10295ae"
+  },
+  "behaviours": [
+    "RecordEvidence",
+    "Attachments"
+  ],
+  "proof_mechanism": "SIMPLE_HASH",
+  "public": false
+}

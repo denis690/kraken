@@ -1,0 +1,53 @@
+group 'com.f1000.test'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def junitVersion = '4.13.2'
+    def restAssuredVersion = '3.3.0'
+    def postgresqlVersion = '9.4-1201-jdbc41'
+    def hamcrestVersion = '2.1'
+    def jacksonVersion = '2.9.8'
+
+    implementation  group: 'junit', name: 'junit', version: junitVersion
+
+    implementation group: 'io.rest-assured', name: 'rest-assured', version: restAssuredVersion
+    implementation group: 'io.rest-assured', name: 'json-path', version: restAssuredVersion // http://www.groovy-lang.org/processing-xml.html#_gpath
+    implementation group: 'io.rest-assured', name: 'xml-path', version: restAssuredVersion
+    implementation group: 'io.rest-assured', name: 'json-schema-validator', version: restAssuredVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
+    implementation group: 'org.json', name: 'json', version: '20210307'
+
+    implementation group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
+    implementation group: 'org.hamcrest', name: 'hamcrest', version: hamcrestVersion
+    implementation group: 'org.javers', name: 'javers-core', version: '5.1.4'
+    implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
+}
+
+allprojects {
+    //Put instructions for all projects
+    //task hello << { task -> println "I'm $task.project.name" }
+}
+
+subprojects {
+    //Put instructions for each sub project
+    apply plugin: "java"
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.+'
+        testCompile 'com.github.tomakehurst:wiremock-jre8:2.27.0' // thin JAR
+        testCompile 'com.github.tomakehurst:wiremock-jre8-standalone:2.27.0' // standalone JAR
+    }
+}
