@@ -1,18 +1,22 @@
-name: Publish Docker Image CI
-
+name: Publish to Registry
 on:
+  release:
+    types: [published]
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
+    branches:
+      - master
+  schedule:
+    - cron: '0 2 * * 0' # Weekly on Sundays at 02:00
 jobs:
-
-  build:
-
+  update:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/checkout@v3
+      - name: Publish to Registry
+        pre: echo ::save-state name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
+        uses: elgohr/Publish-Docker-Github-Action@v4
+        with:
+          name: ${{ secrets.DOCKER_HUB_REPOSITORY }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          tags: "latest,${{ env.STATE_RELEASE_VERSION }}"
