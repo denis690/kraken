@@ -13,5 +13,6 @@ RUN mkdir /kraken/src/build && cd /kraken/src/build && \
       -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined" .. && \
     make
 
+
 # Run the application
 CMD ["/kraken/src/build/API"]
