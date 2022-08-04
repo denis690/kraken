@@ -1,4 +1,4 @@
-# RKVST API tets
+# Kraken API tets
 
 1. Install IntelliJ
 2. in the terminal execute the following:
